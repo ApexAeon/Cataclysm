@@ -2,7 +2,7 @@ import pygame, sys
 from pygame.locals import *
 from common import DISPLAYSURF
 
-gs = {'isMovingUp':'0','isMovingDown':'0','isMovingLeft':'0','isMovingRight':'0','char':'..\\assets\\sprites\\player\\player.png', 'x':'0', 'z':'0', 'lvl':'..\\maps\\c01a\\1.png'}
+gs = {'isMovingUp':'0','isMovingDown':'0','isMovingLeft':'0','isMovingRight':'0','char':'..\\assets\\sprites\\player\\player.png', 'x':'0', 'z':'0', 'lvl':'..\\maps\\c01a\\1.png', 'realX':'0', 'realY':'0'}
 realX = 0
 realY = 0
 
@@ -17,13 +17,9 @@ def start():
     charflip = pygame.transform.flip(char, True, False)
     chardisplay = char
     lvl = pygame.image.load(gs['lvl'])
-
-    
-    while True:
-        realX = int(gs['x']) -int(gs['z'])
-        realY = int(gs['z']) -int(gs['x'])
+    while True: 
         DISPLAYSURF.blit(lvl, (0,0))
-        DISPLAYSURF.blit(chardisplay,(realX,realY))
+        DISPLAYSURF.blit(chardisplay,(int(gs['realX']),int(gs['realY'])))
         for event in pygame.event.get():
             if event.type is QUIT:
                pygame.quit()
@@ -53,13 +49,21 @@ def start():
                 gs['isMovingRight'] = '0'
                 
         if bool(int(gs['isMovingUp'])):
-            gs['z'] = str ( int ( gs['z'] ) - 5 )
+            gs['z'] = int ( gs['z'] ) - 5
+            gs['realX'] = int(gs['realX']) + 5
+            gs['realY'] = int(gs['realY']) - 5
         if bool(int(gs['isMovingLeft'])):
-            gs['x'] = str ( int ( gs['x'] ) - 5 )
+            gs['x'] = int ( gs['x'] ) - 5 
+            gs['realX'] = int(gs['realX']) - 5
+            gs['realY'] = int(gs['realY']) - 5
         if bool(int(gs['isMovingDown'])):
-            gs['z'] = str ( int ( gs['z'] ) + 5 )
+            gs['z'] = int ( gs['z'] ) + 5 
+            gs['realX'] = int(gs['realX']) - 5
+            gs['realY'] = int(gs['realY']) + 5
         if bool(int(gs['isMovingRight'])):
-            gs['x'] = str ( int ( gs['x'] ) + 5 )
+            gs['x'] = int ( gs['x'] ) + 5 
+            gs['realX'] = int(gs['realX']) + 5
+            gs['realY'] = int(gs['realY']) + 5
         
                 
         pygame.display.update()
