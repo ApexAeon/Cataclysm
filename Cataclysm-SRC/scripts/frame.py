@@ -1,0 +1,194 @@
+import pygame, sys
+from pygame.locals import *
+import json
+from enum import Enum
+import game
+from common import DISPLAYSURF
+
+class GameMode(Enum):
+    mainmenu = 0
+    options = 1
+    save = 2
+    load = 3
+    paused = 4
+    console = 5
+    error = 6
+    playing = 7
+
+consolelog = []
+consolelines = 1
+drawn = False
+paused = False
+
+def writescreen(strin, pos):
+    DISPLAYSURF.blit(gamefont.render(strin, True, (0, 128, 255)), pos)
+
+def writeconsole(strin):
+    consolelog.append(strin)
+    if gamestate is GameState.console:
+        writescreen(strin, (0, consolelines * 25))
+        consolelines += 1
+
+gamemode = GameMode.mainmenu
+selected = 1
+
+try:
+    gameinfo = open('..\\data\\gameinfo.json','r') # Load the gameinfo file
+except err:
+    writeconsole('Error: - ', err, ' - Could not get game info, launching in console mode...')
+    gamemode = GameMode.console
+try:
+    parsed = json.loads(gameinfo.read()) # Parse gaminfo's JSON into a dictionary
+except err:
+    writeconsole('Error: - ', err, ' - Could not parse game info, launching in console mode...')
+    gamemode = GameMode.console
+
+cover = pygame.image.load(parsed['cover'])
+level = parsed['mapstart']
+icon = pygame.image.load(parsed['icon'])
+pausebutton = pygame.image.load(parsed['pause'])
+    
+pygame.init()
+pygame.font.init()
+DISPLAYSURF = pygame.display.set_mode((1024, 768))
+pygame.display.set_caption(parsed['name'])
+pygame.display.set_icon(icon)
+gamefont = pygame.font.SysFont('Bauhaus 93 Regular', 40)
+
+while True: # Main loop
+
+    for event in pygame.event.get():
+
+        if event.type is QUIT:
+            pygame.quit()
+            sys.exit()
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.mainmenu: # Code for the main menu. 
+
+            DISPLAYSURF.blit(cover, (0, 0))
+            writescreen('New Game',(25,25))
+            writescreen('Load',(25,50))
+            writescreen('Options',(25,75))
+            writescreen('Quit',(25,100))
+
+            if selected is 5:
+                selected = 1
+            if selected is 0:
+                selected = 4
+
+            if selected is 1:
+                DISPLAYSURF.blit(gamefont.render('New Game',    True, (255, 140, 0)), (25, 25))
+            if selected is 2:
+                DISPLAYSURF.blit(gamefont.render('Load',        True, (255, 140, 0)), (25, 50))
+            if selected is 3:
+                DISPLAYSURF.blit(gamefont.render('Options',     True, (255, 140, 0)), (25, 75))
+            if selected is 4:
+                DISPLAYSURF.blit(gamefont.render('Quit',        True, (255, 140, 0)), (25, 100))
+
+            if event.type is KEYDOWN and event.key is K_e:
+                if selected is 1:
+                    gamemode = GameMode.playing
+                if selected is 2:
+                    gamemode = GameMode.load
+                if selected is 3:
+                    gamemode = GameMode.options
+                if selected is 4:
+                    pygame.quit()
+                    sys.exit()
+                    
+            if event.type is KEYDOWN and event.key is K_s:
+                selected = selected + 1
+            if event.type is KEYDOWN and event.key is K_w:
+                selected = selected - 1
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.load:
+            DISPLAYSURF.blit(cover, (0, 0))
+            game.setGamestate(json.loads(open('../data/save/save.json','r').read()))
+            gamemode = GameMode.playing
+            paused = False
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.save:
+            DISPLAYSURF.blit(cover, (0, 0))
+            open('../data/save/save.json','w').truncate()
+            open('../data/save/save.json','w').write(json.dumps(game.getGamestate()))
+            if paused:
+                gamemode = GameMode.paused
+            else:
+                gamemode = GameMode.mainmenu
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.options:
+            DISPLAYSURF.blit(cover, (0, 0))
+            writescreen( 'Options are currently not available. Please exit the program XD.' , (25,25) )
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.console:
+            DISPLAYSURF.blit(cover, (0, 0))
+
+            # --STUB-- The console will be implemented in other classes
+            # It will be a combination of some simple commands, and also
+            # a FORTH interpreter.
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.paused:
+            paused = True
+            DISPLAYSURF.blit(cover, (0, 0))
+            DISPLAYSURF.blit(pausebutton, (25,25))
+            writescreen('Resume',(25,50))
+            writescreen('Save',(25,75))
+            writescreen('Load',(25,100))
+            writescreen('Options',(25,125))
+            writescreen('Quit',(25,150))
+
+            if selected is 6:
+                selected = 1
+            if selected is 0:
+                selected = 5
+                
+            if selected is 1:
+                DISPLAYSURF.blit(gamefont.render('Resume',    True, (255, 140, 0)), (25, 50))
+            if selected is 2:
+                DISPLAYSURF.blit(gamefont.render('Save',        True, (255, 140, 0)), (25, 75))
+            if selected is 3:
+                DISPLAYSURF.blit(gamefont.render('Load',     True, (255, 140, 0)), (25, 100))
+            if selected is 4:
+                DISPLAYSURF.blit(gamefont.render('Options',        True, (255, 140, 0)), (25, 125))
+            if selected is 5:
+                DISPLAYSURF.blit(gamefont.render('Quit',        True, (255, 140, 0)), (25, 150))
+
+            if event.type is KEYDOWN and event.key is K_e:
+                if selected is 1:
+                    gamemode = GameMode.playing
+                    paused = False
+                if selected is 2:
+                    gamemode = GameMode.save
+                if selected is 3:
+                    gamemode = GameMode.load
+                if selected is 4:
+                    gamemode = GameMode.options
+                if selected is 5:
+                    pygame.quit()
+                    sys.exit()
+
+            if event.type is KEYDOWN and event.key is K_s:
+                selected = selected + 1
+            if event.type is KEYDOWN and event.key is K_w:
+                selected = selected - 1
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.error:
+            DISPLAYSURF.blit(cover, (0, 0))
+
+            # --STUB-- If a fatal error occurs, this will be like the
+            # blue screen of death or something, telling you what's up,
+            # throwing some error codes and dumping it to a file & etc.
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.playing:
+            if game.start() is 'PAUSE':
+                gamemode = GameMode.paused
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        pygame.display.update()
+
+
+#            somebody once told me the world was macoroni
+#            so i took a bite out of a tree
+#            it tasted pretty funny
+#            so i spit it at a bunny
+            
+            
