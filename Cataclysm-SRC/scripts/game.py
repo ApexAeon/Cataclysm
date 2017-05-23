@@ -6,6 +6,34 @@ gs = {'isMovingUp':'0','isMovingDown':'0','isMovingLeft':'0','isMovingRight':'0'
 realX = 0
 realY = 0
 
+'''
+class IsoSprite(pygame.sprite.Sprite):
+    def __init__(self, cont, img):
+        self.controller = cont
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+    def setPos(pos, key)
+        if key is self.controller:
+            self.x = pos[0]
+            self.y = pos[1]
+
+class Player():
+    def __init__(self, sprite, name)
+    def move():
+        if gs['isMovingUp'] is '1':
+
+        if gs['isMovingLeft'] is '1':
+
+        if gs['isMovingDown'] is '1':
+
+        if gs['isMovingRight'] is '1':
+            
+class RemotePlayer():
+
+class AI():
+'''
+
 def getGamestate(): # Will be used for saving.
     return gs
 
