@@ -1,1 +1,1 @@
-{"x": "150", "z": "120", "isMovingUp": "0", "char": "..\\assets\\sprites\\player\\player.png", "lvl": "..\\maps\\testroom\\1.png", "isMovingDown": "0", "isMovingRight": "0", "isMovingLeft": "0"}
+{"isMovingUp": "0", "isMovingDown": "0", "isMovingLeft": "0", "isMovingRight": "0", "char": "..\\assets\\sprites\\player\\player.png", "x": 380, "z": 175, "lvl": "..\\maps\\c01a\\1.png", "realX": 205, "realY": 555}

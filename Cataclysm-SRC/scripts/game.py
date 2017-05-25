@@ -2,7 +2,7 @@ import pygame, sys
 from pygame.locals import *
 from common import DISPLAYSURF
 
-gs = {'isMovingUp':'0','isMovingDown':'0','isMovingLeft':'0','isMovingRight':'0','char':'..\\assets\\sprites\\player\\player.png', 'x':'0', 'z':'0', 'lvl':'..\\maps\\c01a\\1.png', 'realX':'0', 'realY':'0'}
+gs = {'isMovingUp':'0','isMovingDown':'0','isMovingLeft':'0','isMovingRight':'0','char':'..\\assets\\sprites\\player\\player.png', 'x':'0', 'z':'0', 'lvl':'../maps/c01a', 'realX':'300', 'realY':'300'}
 realX = 0
 realY = 0
 
@@ -44,7 +44,9 @@ def start():
     char = pygame.image.load(gs['char'])
     charflip = pygame.transform.flip(char, True, False)
     chardisplay = char
-    lvl = pygame.image.load(gs['lvl'])
+    lvl = pygame.image.load(gs['lvl'] + '/visual.png')
+    charmask = pygame.mask.from_surface(char)
+    lvlmask = pygame.mask.from_surface(pygame.image.load(gs['lvl'] + '/walls.png'))
     while True: 
         DISPLAYSURF.blit(lvl, (0,0))
         DISPLAYSURF.blit(chardisplay,(int(gs['realX']),int(gs['realY'])))
@@ -92,6 +94,13 @@ def start():
             gs['x'] = int ( gs['x'] ) + 5 
             gs['realX'] = int(gs['realX']) + 5
             gs['realY'] = int(gs['realY']) + 5
+
+        if lvlmask.overlap_area(charmask, (int(gs['realX']), int(gs['realY']))) is not 0:
+            gs['realX'] = 300
+            gs['realY'] = 300
+            gs['x'] = 0
+            gs['z'] = 0
+            
         
                 
         pygame.display.update()
