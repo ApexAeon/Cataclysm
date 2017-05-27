@@ -51,6 +51,8 @@ def start():
     bx = 0
     by = 0
     bulletIsExisting = False
+    hitbox = pygame.image.load('../assets/sprites/player/hitbox.png')
+    hitmask = pygame.mask.from_surface(hitbox)
     while True: 
         DISPLAYSURF.blit(lvl, (0,0))
         DISPLAYSURF.blit(chardisplay,(int(gs['realX']),int(gs['realY'])))
@@ -105,34 +107,22 @@ def start():
                 bulletIsExisting = True
                 bulletFacing = facing
 
-            
-                
-                
-        if bool(int(gs['isMovingUp'])) and lvlmask.overlap_area(charmask, (int(gs['realX'])+5, int(gs['realY'])-5)) is 0:
+        if bool(int(gs['isMovingUp'])) and lvlmask.overlap_area(hitmask, (int(gs['realX'])+5, int(gs['realY'])-5)) is 0:
             gs['z'] = int ( gs['z'] ) - 5
             gs['realX'] = int(gs['realX']) + 5
             gs['realY'] = int(gs['realY']) - 5
-        if bool(int(gs['isMovingLeft'])) and lvlmask.overlap_area(charmask, (int(gs['realX'])-5, int(gs['realY'])-5)) is 0:
+        if bool(int(gs['isMovingLeft'])) and lvlmask.overlap_area(hitmask, (int(gs['realX'])-5, int(gs['realY'])-5)) is 0:
             gs['x'] = int ( gs['x'] ) - 5 
             gs['realX'] = int(gs['realX']) - 5
             gs['realY'] = int(gs['realY']) - 5
-        if bool(int(gs['isMovingDown'])) and lvlmask.overlap_area(charmask, (int(gs['realX'])-5, int(gs['realY'])+5)) is 0:
+        if bool(int(gs['isMovingDown'])) and lvlmask.overlap_area(hitmask, (int(gs['realX'])-5, int(gs['realY'])+5)) is 0:
             gs['z'] = int ( gs['z'] ) + 5 
             gs['realX'] = int(gs['realX']) - 5
             gs['realY'] = int(gs['realY']) + 5
-        if bool(int(gs['isMovingRight'])) and lvlmask.overlap_area(charmask, (int(gs['realX'])+5, int(gs['realY'])+5)) is 0:
+        if bool(int(gs['isMovingRight'])) and lvlmask.overlap_area(hitmask, (int(gs['realX'])+5, int(gs['realY'])+5)) is 0:
             gs['x'] = int ( gs['x'] ) + 5 
             gs['realX'] = int(gs['realX']) + 5
             gs['realY'] = int(gs['realY']) + 5
-
-        '''
-        if lvlmask.overlap_area(charmask, (int(gs['realX']), int(gs['realY']))) is not 0:
-            gs['realX'] = 300
-            gs['realY'] = 300
-            gs['x'] = 0
-            gs['z'] = 0
-        '''   
-        
                 
         pygame.display.update()
 
