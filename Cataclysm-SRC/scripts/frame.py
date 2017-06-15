@@ -4,6 +4,7 @@ import json
 from enum import Enum
 import game
 from common import DISPLAYSURF
+from common import FONT
 
 class GameMode(Enum):
     mainmenu = 0
@@ -21,7 +22,7 @@ drawn = False
 paused = False
 
 def writescreen(strin, pos):
-    DISPLAYSURF.blit(gamefont.render(strin, True, (0, 128, 255)), pos)
+    DISPLAYSURF.blit(FONT.render(strin, True, (0, 128, 255)), pos)
 
 def writeconsole(strin):
     consolelog.append(strin)
@@ -49,11 +50,10 @@ icon = pygame.image.load(parsed['icon'])
 pausebutton = pygame.image.load(parsed['pause'])
     
 pygame.init()
-pygame.font.init()
 DISPLAYSURF = pygame.display.set_mode((1024, 768))
 pygame.display.set_caption(parsed['name'])
 pygame.display.set_icon(icon)
-gamefont = pygame.font.SysFont('Bauhaus 93 Regular', 40)
+FONT = pygame.font.SysFont('Bauhaus 93 Regular', 40)
 
 while True: # Main loop
 
@@ -77,13 +77,13 @@ while True: # Main loop
                 selected = 4
 
             if selected is 1:
-                DISPLAYSURF.blit(gamefont.render('New Game',    True, (255, 140, 0)), (25, 25))
+                DISPLAYSURF.blit(FONT.render('New Game',    True, (255, 140, 0)), (25, 25))
             if selected is 2:
-                DISPLAYSURF.blit(gamefont.render('Load',        True, (255, 140, 0)), (25, 50))
+                DISPLAYSURF.blit(FONT.render('Load',        True, (255, 140, 0)), (25, 50))
             if selected is 3:
-                DISPLAYSURF.blit(gamefont.render('Options',     True, (255, 140, 0)), (25, 75))
+                DISPLAYSURF.blit(FONT.render('Options',     True, (255, 140, 0)), (25, 75))
             if selected is 4:
-                DISPLAYSURF.blit(gamefont.render('Quit',        True, (255, 140, 0)), (25, 100))
+                DISPLAYSURF.blit(FONT.render('Quit',        True, (255, 140, 0)), (25, 100))
 
             if event.type is KEYDOWN and event.key is K_e:
                 if selected is 1:
@@ -143,15 +143,15 @@ while True: # Main loop
                 selected = 5
                 
             if selected is 1:
-                DISPLAYSURF.blit(gamefont.render('Resume',    True, (255, 140, 0)), (25, 50))
+                DISPLAYSURF.blit(FONT.render('Resume',    True, (255, 140, 0)), (25, 50))
             if selected is 2:
-                DISPLAYSURF.blit(gamefont.render('Save',        True, (255, 140, 0)), (25, 75))
+                DISPLAYSURF.blit(FONT.render('Save',        True, (255, 140, 0)), (25, 75))
             if selected is 3:
-                DISPLAYSURF.blit(gamefont.render('Load',     True, (255, 140, 0)), (25, 100))
+                DISPLAYSURF.blit(FONT.render('Load',     True, (255, 140, 0)), (25, 100))
             if selected is 4:
-                DISPLAYSURF.blit(gamefont.render('Options',        True, (255, 140, 0)), (25, 125))
+                DISPLAYSURF.blit(FONT.render('Options',        True, (255, 140, 0)), (25, 125))
             if selected is 5:
-                DISPLAYSURF.blit(gamefont.render('Quit',        True, (255, 140, 0)), (25, 150))
+                DISPLAYSURF.blit(FONT.render('Quit',        True, (255, 140, 0)), (25, 150))
 
             if event.type is KEYDOWN and event.key is K_e:
                 if selected is 1:
