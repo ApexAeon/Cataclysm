@@ -85,7 +85,7 @@ while True: # Main loop
             if selected is 4:
                 DISPLAYSURF.blit(FONT.render('Quit',        True, (255, 140, 0)), (25, 100))
 
-            if event.type is KEYDOWN and event.key is K_e:
+            if event.type is KEYDOWN and event.key is K_RETURN:
                 if selected is 1:
                     gamemode = GameMode.playing
                 if selected is 2:
@@ -153,7 +153,7 @@ while True: # Main loop
             if selected is 5:
                 DISPLAYSURF.blit(FONT.render('Quit',        True, (255, 140, 0)), (25, 150))
 
-            if event.type is KEYDOWN and event.key is K_e:
+            if event.type is KEYDOWN and event.key is K_RETURN:
                 if selected is 1:
                     gamemode = GameMode.playing
                     paused = False
