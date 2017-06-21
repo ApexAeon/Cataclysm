@@ -9,11 +9,13 @@ FONT = pygame.font.SysFont('Bauhaus 93 Regular', 40)
 def tickDoor(obj): # For every door object in a level, this will run, with the specified parameters of each specific door.
     if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
         # Take the player to the destination if they are within the boundaries of the door.
-        gs['x'] = 0
-        gs['y'] = 0
-        gs['z'] = 0
-        gs['realX'] = 300
-        gs['realY'] = 300
+        gs['x'] = obj['exitposdict']['x']
+        gs['y'] = obj['exitposdict']['y']
+        gs['z'] = obj['exitposdict']['z']
+        gs['realX'] = 300 + gs['x'] + gs['z']
+        gs['realY'] = 300 + gs['x'] + gs['z'] + gs['y']
+        gs['lvl'] = obj['exitlvl']
+        return 'CHANGELVL'
 def getGamestate(): # Will be used for saving.
     return gs
 
@@ -40,7 +42,8 @@ def start():
 
         for obj in entities: # Tick through every entity in the lvl
             if obj['type'] == 'door':
-                tickDoor(obj)
+                if tickDoor(obj) == 'CHANGELVL':
+                    return 'CHANGELVL'
         
         if bulletIsExisting:
             DISPLAYSURF.blit(bullet,(bx,by))

@@ -180,8 +180,12 @@ while True: # Main loop
             # throwing some error codes and dumping it to a file & etc.
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         if gamemode is GameMode.playing:
-            if game.start() is 'PAUSE':
+            gameresult = game.start()
+            if gameresult is 'PAUSE':
                 gamemode = GameMode.paused
+            elif gameresult is 'CHANGELVL':
+                gameresult = game.start()
+            
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         pygame.display.update()
 
