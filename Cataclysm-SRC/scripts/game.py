@@ -1,11 +1,28 @@
 import pygame, sys
 from pygame.locals import *
 from common import DISPLAYSURF
+from common import FONT
 import json
+import time
 
-gs = {'isJumping':False,'jumpHeight':0,'isMovingUp':False,'isMovingDown':False,'isMovingLeft':False,'isMovingRight':False,'char':'../assets/sprites/player/player.png', 'x':0, 'y':0 ,'z':0, 'lvl':'../maps/c01a', 'realX':300, 'realY':300}
-pygame.font.init()
-FONT = pygame.font.SysFont('Bauhaus 93 Regular', 40)
+gs = {
+    'isJumping':False,
+    'jumpHeight':0,
+    'isMovingUp':False,
+    'isMovingDown':False,
+    'isMovingLeft':False,
+    'isMovingRight':False,
+    'char':'../assets/sprites/player/player.png',
+    'x':0,
+    'y':0 ,
+    'z':0,
+    'lvl':'../maps/c01a',
+    'realX':200,
+    'realY':200
+}
+
+timeStart = 0
+
 def tickDoor(obj): # For every door object in a level, this will run, with the specified parameters of each specific door.
     if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
         # Take the player to the destination if they are within the boundaries of the door.
@@ -36,7 +53,8 @@ def start():
     by = 0
     bulletIsExisting = False
     hitmask = pygame.mask.from_surface(pygame.image.load('../assets/sprites/player/hitbox.png'))
-    while True: 
+    while True:
+        timeStart = time.process_time()
         DISPLAYSURF.blit(lvl, (0,0))
         DISPLAYSURF.blit(chardisplay,(gs['realX'],gs['realY']))
 
@@ -128,8 +146,10 @@ def start():
                 gs['isJumping'] = 0
 
         DISPLAYSURF.blit(FONT.render(str(gs['x']) + '_' + str(gs['y']) + '_' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25))
-
-        pygame.display.update()
+        while True:
+            if time.process_time() - timeStart > 0.03:
+                pygame.display.update()
+                break
 
      
             

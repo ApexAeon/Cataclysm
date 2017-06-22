@@ -1,1 +1,7 @@
-[]                     
+[{
+"type":"door",
+"posdict":{"x":-200,"y":0,"z":-20},
+"dposdict":{"x":-200,"y":0,"z":-20},
+"exitlvl":"../maps/c01a/",
+"exitposdict":{"x":0,"y":0,"z":0}
+}]                     

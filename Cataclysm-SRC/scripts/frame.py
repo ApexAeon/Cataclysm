@@ -33,16 +33,9 @@ def writeconsole(strin):
 gamemode = GameMode.mainmenu
 selected = 1
 
-try:
-    gameinfo = open('..\\data\\gameinfo.json','r') # Load the gameinfo file
-except err:
-    writeconsole('Error: - ', err, ' - Could not get game info, launching in console mode...')
-    gamemode = GameMode.console
-try:
-    parsed = json.loads(gameinfo.read()) # Parse gaminfo's JSON into a dictionary
-except err:
-    writeconsole('Error: - ', err, ' - Could not parse game info, launching in console mode...')
-    gamemode = GameMode.console
+
+gameinfo = open('..\\data\\gameinfo.json','r') # Load the gameinfo file
+parsed = json.loads(gameinfo.read()) # Parse gaminfo's JSON into a dictionary
 
 cover = pygame.image.load(parsed['cover'])
 level = parsed['mapstart']
@@ -180,12 +173,8 @@ while True: # Main loop
             # throwing some error codes and dumping it to a file & etc.
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         if gamemode is GameMode.playing:
-            gameresult = game.start()
-            if gameresult is 'PAUSE':
+            if game.start() is 'PAUSE':
                 gamemode = GameMode.paused
-            elif gameresult is 'CHANGELVL':
-                gameresult = game.start()
-            
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         pygame.display.update()
 
