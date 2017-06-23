@@ -16,7 +16,7 @@ gs = {
     'x':0,
     'y':0 ,
     'z':0,
-    'lvl':'../maps/c01a',
+    'lvl':'c01a',
     'realX':200,
     'realY':200
 }
@@ -29,8 +29,8 @@ def tickDoor(obj): # For every door object in a level, this will run, with the s
         gs['x'] = obj['exitposdict']['x']
         gs['y'] = obj['exitposdict']['y']
         gs['z'] = obj['exitposdict']['z']
-        gs['realX'] = 300 + gs['x'] + gs['z']
-        gs['realY'] = 300 + gs['x'] + gs['z'] + gs['y']
+        gs['realX'] = 200 + gs['x'] + gs['z']
+        gs['realY'] = 200 + gs['x'] + gs['z'] + gs['y']
         gs['lvl'] = obj['exitlvl']
         return 'CHANGELVL'
 def getGamestate(): # Will be used for saving.
@@ -44,10 +44,10 @@ def start():
     char = pygame.image.load(gs['char'])
     charflip = pygame.transform.flip(char, True, False)
     chardisplay = char
-    lvl = pygame.image.load(gs['lvl'] + '/visual.png')
-    entities = json.loads(open(gs['lvl'] + '/entities.json').read())
+    lvl = pygame.image.load('../maps/' + gs['lvl'] + '/visual.png')
+    entities = json.loads(open('../maps/' + gs['lvl'] + '/entities.json').read())
     charmask = pygame.mask.from_surface(char)
-    lvlmask = pygame.mask.from_surface(pygame.image.load(gs['lvl'] + '/walls.png'))
+    lvlmask = pygame.mask.from_surface(pygame.image.load('../maps/' + gs['lvl'] + '/walls.png'))
     bullet = pygame.image.load('../assets/sprites/bullet/bullet.png')
     bx = 0
     by = 0
@@ -116,22 +116,22 @@ def start():
                 bulletIsExisting = True
                 bulletFacing = facing
 
-        if gs['isMovingUp'] and lvlmask.overlap_area(hitmask, (gs['realX']+5, gs['realY']-5)) is 0:
+        if gs['isMovingUp'] and lvlmask.overlap_area(hitmask, (gs['realX']+4, gs['realY']-2+gs['y'])) is 0:
             gs['z'] = gs['z'] - 5
-            gs['realX'] = gs['realX'] + 5
-            gs['realY'] = gs['realY'] - 5
-        if gs['isMovingLeft'] and lvlmask.overlap_area(hitmask, (gs['realX']-5, gs['realY']-5)) is 0:
+            gs['realX'] = gs['realX'] + 4
+            gs['realY'] = gs['realY'] - 2
+        if gs['isMovingLeft'] and lvlmask.overlap_area(hitmask, (gs['realX']-4, gs['realY']-2+gs['y'])) is 0:
             gs['x'] = gs['x'] - 5 
-            gs['realX'] = gs['realX'] - 5
-            gs['realY'] = gs['realY'] - 5
-        if gs['isMovingDown'] and lvlmask.overlap_area(hitmask, (gs['realX']-5, gs['realY']+5)) is 0:
+            gs['realX'] = gs['realX'] - 4
+            gs['realY'] = gs['realY'] - 2
+        if gs['isMovingDown'] and lvlmask.overlap_area(hitmask, (gs['realX']-4, gs['realY']+2+gs['y'])) is 0:
             gs['z'] = gs['z'] + 5 
-            gs['realX'] = gs['realX'] - 5
-            gs['realY'] = gs['realY'] + 5
-        if gs['isMovingRight'] and lvlmask.overlap_area(hitmask, (gs['realX']+5, gs['realY']+5)) is 0:
+            gs['realX'] = gs['realX'] - 4
+            gs['realY'] = gs['realY'] + 2
+        if gs['isMovingRight'] and lvlmask.overlap_area(hitmask, (gs['realX']+4, gs['realY']+2+gs['y'])) is 0:
             gs['x'] = gs['x'] + 5 
-            gs['realX'] = gs['realX'] + 5
-            gs['realY'] = gs['realY'] + 5
+            gs['realX'] = gs['realX'] + 4
+            gs['realY'] = gs['realY'] + 2
 
         if gs['isJumping']:
             if gs['jumpHeight'] is not 50:

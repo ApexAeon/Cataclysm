@@ -1,7 +1,7 @@
 [{
 "type":"door",
-"posdict":{"x":-200,"y":0,"z":-20},
-"dposdict":{"x":-200,"y":0,"z":-20},
-"exitlvl":"../maps/c01a/",
-"exitposdict":{"x":0,"y":0,"z":0}
+"posdict":{"x":-70,"y":0,"z":85},
+"dposdict":{"x":-60,"y":50,"z":130},
+"exitlvl":"c01a",
+"exitposdict":{"x":255,"y":0,"z":-180}
 }]                     

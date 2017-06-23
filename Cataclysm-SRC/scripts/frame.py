@@ -38,12 +38,11 @@ gameinfo = open('..\\data\\gameinfo.json','r') # Load the gameinfo file
 parsed = json.loads(gameinfo.read()) # Parse gaminfo's JSON into a dictionary
 
 cover = pygame.image.load(parsed['cover'])
-level = parsed['mapstart']
 icon = pygame.image.load(parsed['icon'])
 pausebutton = pygame.image.load(parsed['pause'])
     
 pygame.init()
-DISPLAYSURF = pygame.display.set_mode((1024, 768))
+DISPLAYSURF = pygame.display.set_mode((828, 640))
 pygame.display.set_caption(parsed['name'])
 pygame.display.set_icon(icon)
 FONT = pygame.font.SysFont('Bauhaus 93 Regular', 40)

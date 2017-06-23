@@ -1,9 +1,7 @@
 [
-{
-"type":"door",
-"posdict":{"x":35,"y":0,"z":-100},
-"dposdict":{"x":55,"y":50,"z":-100},
-"exitlvl":"../maps/c01b/",
-"exitposdict":{"x":-185,"y":0,"z":-25}
-}
+{"type":"door",
+"posdict":{"x":225,"y":0,"z":-200},
+"dposdict":{"x":275,"y":50,"z":-195},
+"exitlvl":"c01b",
+"exitposdict":{"x":-35,"y":0,"z":110}}
 ]                     
