@@ -15,6 +15,7 @@ class GameMode(Enum):
     console = 5
     error = 6
     playing = 7
+    gameover = 8
 
 consolelog = []
 consolelines = 1
@@ -31,6 +32,9 @@ def writeconsole(strin):
         consolelines += 1
 
 gamemode = GameMode.mainmenu
+
+
+
 selected = 1
 
 
@@ -40,6 +44,7 @@ parsed = json.loads(gameinfo.read()) # Parse gaminfo's JSON into a dictionary
 cover = pygame.image.load(parsed['cover'])
 icon = pygame.image.load(parsed['icon'])
 pausebutton = pygame.image.load(parsed['pause'])
+gameoverscreen = pygame.image.load(parsed['gameover'])
     
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((828, 640))
@@ -172,9 +177,40 @@ while True: # Main loop
             # throwing some error codes and dumping it to a file & etc.
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         if gamemode is GameMode.playing:
-            if game.start() is 'PAUSE':
+            gamemsg = game.start()
+            if gamemsg is 'PAUSE':
                 gamemode = GameMode.paused
+            elif gamemsg is 'DIE':
+                gamemode = GameMode.gameover
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if gamemode is GameMode.gameover:
+            DISPLAYSURF.blit(gameoverscreen, (0,0))
+            writescreen('Yes',(25,175))
+            writescreen('No',(25,200))
+            if event.type is KEYDOWN and event.key is K_RETURN:
+                if selected is 1:
+                    gamemode = GameMode.playing
+                if selected is 2:
+                    pygame.quit()
+                    sys.exit()
+
+            if event.type is KEYDOWN and event.key is K_s:
+                selected = selected + 1
+            if event.type is KEYDOWN and event.key is K_w:
+                selected = selected - 1
+
+            if selected is 3:
+                selected = 1
+            if selected is 0:
+                selected = 2
+
+            if selected is 1:
+                DISPLAYSURF.blit(FONT.render('Yes', True, (255, 140, 0)), (25, 175))
+            if selected is 2:
+                DISPLAYSURF.blit(FONT.render('No', True, (255, 140, 0)), (25, 200))
+                
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         pygame.display.update()
 
 

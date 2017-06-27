@@ -1,0 +1,7 @@
+[
+{"type":"door",
+"posdict":{"x":125,"y":0,"z":85},
+"dposdict":{"x":128,"y":50,"z":100},
+"exitlvl":"c01a2",
+"exitposdict":{"x":255,"y":0,"z":-20}}
+]                     
