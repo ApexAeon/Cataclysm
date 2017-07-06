@@ -5,6 +5,7 @@ from common import FONT
 import json
 import time
 import math
+import sound
 
 gs = {
     'isJumping':False,
@@ -64,7 +65,10 @@ def start():
     by = 0
     bulletIsExisting = False
     hitmask = pygame.mask.from_surface(pygame.image.load('../assets/sprites/player/hitbox.png'))
+    dat = json.loads(open('../maps/' + gs['lvl'] + '/dat.json').read())
+    sound.play(dat['sounds'])
     while True:
+        sound.ping()
         if not gs['isAlive']:
             return 'DIE'
         gs['realX'] = math.floor(gs['x'] * 2 - gs['z'] * 2 + 0.25)

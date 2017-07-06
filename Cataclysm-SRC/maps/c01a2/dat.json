@@ -1,0 +1,5 @@
+{"sounds":
+	{"music":
+		{"songPlaysInLevel":true,
+		"song":"../assets/sounds/music/gamesong.ogg",
+		"resetMusic":false}}}
