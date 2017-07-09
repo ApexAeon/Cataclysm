@@ -23,8 +23,11 @@ gs = {
     'realY':0,
     'facing':'left',
     'speed':1,
-    'isAlive':True
+    'isAlive':True,
+    'bullets':[]
 }
+
+res = {}
 
 def tickDoor(obj): # For every door object in a level, this will run, with the specified parameters of each specific door.
     if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
@@ -43,38 +46,36 @@ def tickDoor(obj): # For every door object in a level, this will run, with the s
 def tickKill(obj):
     if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
         gs['isAlive'] = False
-def tickLadder(obj):
-    if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
-        print('You are supposedly on a ladder...')
+
 def getGamestate(): # Will be used for saving.
     return gs
-
 def setGamestate(gsin): # Will be used for loading.
     gs = gsin
 
 def start():
-    char = pygame.image.load(gs['char'])
-    charflip = pygame.transform.flip(char, True, False)
-    chardisplay = char
-    lvl = pygame.image.load('../maps/' + gs['lvl'] + '/visual.png')
+    res['charLeft'] = pygame.image.load(gs['char'])
+    res['charRight'] = pygame.transform.flip(res['charLeft'], True, False)
+    res['bullet'] = pygame.image.load('../assets/sprites/bullet/bullet.png')
+    res['hitbox'] = pygame.image.load('../assets/sprites/player/hitbox.png')
+    res['lvl'] = pygame.image.load('../maps/' + gs['lvl'] + '/visual.png')
+    res['walls'] = pygame.image.load('../maps/' + gs['lvl'] + '/walls.png')
+    chardisplay = res['charLeft']
     entities = json.loads(open('../maps/' + gs['lvl'] + '/entities.json').read())
-    charmask = pygame.mask.from_surface(char)
-    lvlmask = pygame.mask.from_surface(pygame.image.load('../maps/' + gs['lvl'] + '/walls.png'))
-    bullet = pygame.image.load('../assets/sprites/bullet/bullet.png')
-    bx = 0
-    by = 0
-    bulletIsExisting = False
-    hitmask = pygame.mask.from_surface(pygame.image.load('../assets/sprites/player/hitbox.png'))
+    lvlmask = pygame.mask.from_surface(res['walls'])
+    hitmask = pygame.mask.from_surface(res['hitbox'])
     dat = json.loads(open('../maps/' + gs['lvl'] + '/dat.json').read())
     sound.play(dat['sounds'])
+    bulletIsExisting = False
     while True:
         sound.ping()
         if not gs['isAlive']:
             return 'DIE'
         gs['realX'] = math.floor(gs['x'] * 2 - gs['z'] * 2 + 0.25)
         gs['realY'] = math.floor(gs['x'] + gs['z'] - gs['y'] + 0.50)
-        timeStart = time.process_time()
-        DISPLAYSURF.blit(lvl, (0,0))
+
+        timeStart = time.process_time() # Used to facilitate timing and FPS, see bottom of loop for more info.
+
+        DISPLAYSURF.blit(res['lvl'], (0,0))
         DISPLAYSURF.blit(chardisplay,(gs['realX'],gs['realY']))
 
         for obj in entities: # Tick through every entity in the lvl
@@ -85,7 +86,7 @@ def start():
                 tickKill(obj)
         
         if bulletIsExisting:
-            DISPLAYSURF.blit(bullet,(bx,by))
+            DISPLAYSURF.blit(res['bullet'],(bx,by))
             if gs['bulletDirection'] is 'left':
                 bx = bx - 5
                 by = by - 5
@@ -111,14 +112,14 @@ def start():
                 gs['facing'] = 'up'
             if event.type is KEYDOWN and event.key is K_a:
                 gs['isMovingLeft'] = True
-                chardisplay = char
+                chardisplay = res['charLeft']
                 gs['facing'] = 'left'
             if event.type is KEYDOWN and event.key is K_s:
                 gs['isMovingDown'] = True
                 gs['facing'] = 'down'
             if event.type is KEYDOWN and event.key is K_d:
                 gs['isMovingRight'] = True
-                chardisplay = charflip
+                chardisplay = res['charRight']
                 gs['facing'] = 'right'
                 
             if event.type is KEYDOWN and event.key is K_SPACE:
@@ -160,8 +161,9 @@ def start():
                 gs['jumpHeight'] = 0
                 gs['isJumping'] = 0
 
-        DISPLAYSURF.blit(FONT.render(str(gs['x']) + '_' + str(gs['y']) + '_' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25))
-        while True:
+        DISPLAYSURF.blit(FONT.render(str(gs['x']) + '_' + str(gs['y']) + '_' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25)) # Display current player position for dev use.
+
+        while True: # Delays time and makes sure a certain amount has passed since the last tick. Prevents crazy FPS and weird timing.
             if time.process_time() - timeStart > 0.03:
                 pygame.display.update()
                 break
