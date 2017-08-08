@@ -27,6 +27,7 @@ assets = []
 for dirpath, dirnames, filenames in os.walk("..\\src\\assets\\textures"):
     for filename in [f for f in filenames if f.endswith(".png")]:
         assets.append(pygame.image.load(os.path.join(dirpath, filename)))
+print(pygame.display.list_modes())
 while True:
     if placing is False:
         dispcopy = DISPLAYSURF.copy()
@@ -79,6 +80,32 @@ while True:
                 DISPLAYSURF.blit(dispcopy, (0, 0))
                 DISPLAYSURF.blit(assets[currentAsset], (currentX, currentY))
                 placing = False
+            elif event.key == K_ESCAPE:
+                while True:
+                    command = input("> ")
+                    if command == "save":
+                        command = input("Name: ")
+                        pygame.image.save(dispcopy, './maps/'+command+'.png')
+                    elif command == "new":
+                        for a in range(0, 640//gridunit.get_height()*gridunit.get_height(), gridunit.get_height()):
+                            currentY = a
+                            for b in range(0, 828//gridunit.get_width()*gridunit.get_width(), gridunit.get_width()):
+                                currentX = b
+                                DISPLAYSURF.blit(gridunit, (currentX, currentY))
+                        placing = False
+                    elif command == "load":
+                        command = input("Name: ")                        
+                        DISPLAYSURF.blit(pygame.image.load('./maps/'+command+'.png'), (0, 0))
+                        placing = False
+                    elif command == "exit":
+                        break
+            elif event.key == K_f:
+                DISPLAYSURF = pygame.display.set_mode((828, 640), pygame.FULLSCREEN)
+                DISPLAYSURF.blit(dispcopy, (0, 0))
+            elif event.key == K_g:
+                DISPLAYSURF = pygame.display.set_mode((828, 640))
+                DISPLAYSURF.blit(dispcopy, (0, 0))
+                
     pygame.display.update()
                 
 

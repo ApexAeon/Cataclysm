@@ -15,14 +15,14 @@ gs = {
     'isMovingLeft':False,
     'isMovingRight':False,
     'char':'../assets/sprites/player/player.png',
-    'x':96,
+    'x':25,
     'y':0 ,
-    'z':65,
+    'z':12,
     'lvl':'c01a',
     'realX':0,
     'realY':0,
     'facing':'left',
-    'speed':1,
+    'speed':0.5,
     'isAlive':True,
     'bullets':[]
 }
@@ -52,6 +52,10 @@ def getGamestate(): # Will be used for saving.
 def setGamestate(gsin): # Will be used for loading.
     gs = gsin
 
+def calcX(x, y, z):
+    return ((x * 2 - z * 2) + 0.25 * (x-z)) * 4
+def calcY(x, y, z):
+    return ((x + z - y) + 0.25 * (x+z)) * 4
 def start():
     res['charLeft'] = pygame.image.load(gs['char'])
     res['charRight'] = pygame.transform.flip(res['charLeft'], True, False)
@@ -70,13 +74,13 @@ def start():
         sound.ping()
         if not gs['isAlive']:
             return 'DIE'
-        gs['realX'] = math.floor(gs['x'] * 2 - gs['z'] * 2 + 0.25)
-        gs['realY'] = math.floor(gs['x'] + gs['z'] - gs['y'] + 0.50)
+        gs['realX'] = calcX(gs['x'], gs['y'], gs['z'])
+        gs['realY'] = calcY(gs['x'], gs['y'], gs['z'])
 
         timeStart = time.process_time() # Used to facilitate timing and FPS, see bottom of loop for more info.
 
         DISPLAYSURF.blit(res['lvl'], (0,0))
-        DISPLAYSURF.blit(chardisplay,(gs['realX'],gs['realY']))
+        DISPLAYSURF.blit(chardisplay,(math.floor(gs['realX']),math.floor(gs['realY'])))
 
         for obj in entities: # Tick through every entity in the lvl
             if obj['type'] == 'door':
@@ -139,16 +143,20 @@ def start():
                 by = gs['realY']+25
                 bulletIsExisting = True
                 gs['bulletDirection'] = gs['facing']
-
-        if gs['isMovingUp'] and     lvlmask.overlap_area(hitmask, (math.floor(gs['x'] * 2 - (gs['z']-2*gs['speed']) * 2 + 0.25) , math.floor(gs['x'] + (gs['z']-2*gs['speed']) + 0.50))) is 0:
-            gs['z'] = gs['z'] - 2*gs['speed']
-        if gs['isMovingLeft'] and   lvlmask.overlap_area(hitmask, (math.floor((gs['x']-2*gs['speed']) * 2 - gs['z'] * 2 + 0.25) , math.floor((gs['x']-2*gs['speed']) + gs['z'] + 0.50))) is 0:
-            gs['x'] = gs['x'] - 2*gs['speed'] 
-        if gs['isMovingDown'] and   lvlmask.overlap_area(hitmask, (math.floor(gs['x'] * 2 - (gs['z']+2*gs['speed']) * 2 + 0.25) , math.floor(gs['x'] + (gs['z']+2*gs['speed']) + 0.50))) is 0:
-            gs['z'] = gs['z'] + 2*gs['speed'] 
-        if gs['isMovingRight'] and  lvlmask.overlap_area(hitmask, (math.floor((gs['x']+2*gs['speed']) * 2 - gs['z'] * 2 + 0.25) , math.floor((gs['x']+2*gs['speed']) + gs['z'] + 0.50))) is 0:
-            gs['x'] = gs['x'] + 2*gs['speed']
-
+#
+# Collision Detection
+#
+        if gs['isMovingUp'] and     lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x'],0,gs['z']-1*gs['speed'])) , math.floor(calcY(gs['x'],0,gs['z']-1*gs['speed'])) ) ) is 0:
+            gs['z'] = gs['z'] - 1*gs['speed']
+        if gs['isMovingLeft'] and   lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x']-1*gs['speed'],0,gs['z'])) , math.floor(calcY(gs['x']-1*gs['speed'],0,gs['z'])) ) ) is 0:
+            gs['x'] = gs['x'] - 1*gs['speed'] 
+        if gs['isMovingDown'] and   lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x'],0,gs['z']+1*gs['speed'])) , math.floor(calcY(gs['x'],0,gs['z']+1*gs['speed'])) ) ) is 0:
+            gs['z'] = gs['z'] + 1*gs['speed'] 
+        if gs['isMovingRight'] and  lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x']+1*gs['speed'],0,gs['z'])) , math.floor(calcY(gs['x']+1*gs['speed'],0,gs['z'])) ) ) is 0:
+            gs['x'] = gs['x'] + 1*gs['speed']
+#
+# Jumping
+#
         if gs['isJumping']:
             if gs['jumpHeight'] is not 50:
                 gs['y'] = gs['y'] + 5
@@ -160,11 +168,13 @@ def start():
             if gs['jumpHeight'] is 50 and gs['y'] is 0:
                 gs['jumpHeight'] = 0
                 gs['isJumping'] = 0
-
-        DISPLAYSURF.blit(FONT.render(str(gs['x']) + '_' + str(gs['y']) + '_' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25)) # Display current player position for dev use.
+#
+# Debug Coordinates
+#
+        DISPLAYSURF.blit(FONT.render('X: ' + str(gs['x']) + ' Y: ' + str(gs['y']) + ' Z: ' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25)) # Display current player position for dev use.
 
         while True: # Delays time and makes sure a certain amount has passed since the last tick. Prevents crazy FPS and weird timing.
-            if time.process_time() - timeStart > 0.03:
+            if time.process_time() - timeStart > 0.03: #0.03
                 pygame.display.update()
                 break
 
