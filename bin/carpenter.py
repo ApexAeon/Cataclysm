@@ -100,11 +100,13 @@ while True:
                     elif command == "exit":
                         break
             elif event.key == K_f:
+                copy = DISPLAYSURF.copy()
                 DISPLAYSURF = pygame.display.set_mode((828, 640), pygame.FULLSCREEN)
-                DISPLAYSURF.blit(dispcopy, (0, 0))
+                DISPLAYSURF.blit(copy, (0, 0))
             elif event.key == K_g:
+                copy = DISPLAYSURF.copy()
                 DISPLAYSURF = pygame.display.set_mode((828, 640))
-                DISPLAYSURF.blit(dispcopy, (0, 0))
+                DISPLAYSURF.blit(copy, (0, 0))
                 
     pygame.display.update()
                 

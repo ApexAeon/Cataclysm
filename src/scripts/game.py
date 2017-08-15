@@ -6,6 +6,9 @@ import json
 import time
 import math
 import sound
+import pygame.mixer
+
+pygame.mixer.init()
 
 gs = {
     'isJumping':False,
@@ -24,7 +27,9 @@ gs = {
     'facing':'left',
     'speed':0.5,
     'isAlive':True,
-    'bullets':[]
+    'bullets':[],
+    'isMoving':False,
+    'velocity':{'north':0, 'south':0, 'east':0, 'west':0, 'up':0, 'down':0}
 }
 
 res = {}
@@ -70,6 +75,10 @@ def start():
     dat = json.loads(open('../maps/' + gs['lvl'] + '/dat.json').read())
     sound.play(dat['sounds'])
     bulletIsExisting = False
+    res['stepsounds'] = pygame.mixer.Sound('../assets/sounds/player/step.wav')
+#
+# Main Game Loop
+#
     while True:
         sound.ping()
         if not gs['isAlive']:
@@ -103,28 +112,35 @@ def start():
             if gs['bulletDirection'] is 'down':
                 bx = bx - 5
                 by = by + 5
+
+#
+# Event Processing
+#
         for event in pygame.event.get():
             if event.type is QUIT:
                pygame.quit()
                sys.exit()
-
             if event.type is KEYDOWN and event.key is K_ESCAPE:
                 return 'PAUSE'
             
             if event.type is KEYDOWN and event.key is K_w:
                 gs['isMovingUp'] = True
-                gs['facing'] = 'up'
+                gs['facing'] = 'up'               
+                gs['isMoving'] = True
             if event.type is KEYDOWN and event.key is K_a:
                 gs['isMovingLeft'] = True
                 chardisplay = res['charLeft']
-                gs['facing'] = 'left'
+                gs['facing'] = 'left'                
+                gs['isMoving'] = True
             if event.type is KEYDOWN and event.key is K_s:
                 gs['isMovingDown'] = True
-                gs['facing'] = 'down'
+                gs['facing'] = 'down'               
+                gs['isMoving'] = True
             if event.type is KEYDOWN and event.key is K_d:
                 gs['isMovingRight'] = True
                 chardisplay = res['charRight']
                 gs['facing'] = 'right'
+                gs['isMoving'] = True
                 
             if event.type is KEYDOWN and event.key is K_SPACE:
                 gs['isJumping'] = True
@@ -144,7 +160,7 @@ def start():
                 bulletIsExisting = True
                 gs['bulletDirection'] = gs['facing']
 #
-# Collision Detection
+# Collision Detection and Movement
 #
         if gs['isMovingUp'] and     lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x'],0,gs['z']-1*gs['speed'])) , math.floor(calcY(gs['x'],0,gs['z']-1*gs['speed'])) ) ) is 0:
             gs['z'] = gs['z'] - 1*gs['speed']
@@ -173,6 +189,8 @@ def start():
 #
         DISPLAYSURF.blit(FONT.render('X: ' + str(gs['x']) + ' Y: ' + str(gs['y']) + ' Z: ' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25)) # Display current player position for dev use.
 
+        
+        
         while True: # Delays time and makes sure a certain amount has passed since the last tick. Prevents crazy FPS and weird timing.
             if time.process_time() - timeStart > 0.03: #0.03
                 pygame.display.update()
