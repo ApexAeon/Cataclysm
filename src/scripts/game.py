@@ -25,14 +25,18 @@ gs = {
     'realX':0,
     'realY':0,
     'facing':'left',
-    'speed':0.5,
+    'speed':0.3,
     'isAlive':True,
     'bullets':[],
     'isMoving':False,
-    'velocity':{'north':0, 'south':0, 'east':0, 'west':0, 'up':0, 'down':0}
+    'velocity':{'north':0, 'south':0, 'east':0, 'west':0, 'up':0, 'down':0},
+    'isLoaded':False,
+    'acceleration':0.1
 }
 
 res = {}
+entities = {}
+dat = {}
 
 def tickDoor(obj): # For every door object in a level, this will run, with the specified parameters of each specific door.
     if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
@@ -52,30 +56,33 @@ def tickKill(obj):
     if gs['x'] >= obj['posdict']['x'] and gs['y'] >= obj['posdict']['y'] and gs['z'] >= obj['posdict']['z'] and gs['x'] <= obj['dposdict']['x'] and gs['y'] <= obj['dposdict']['y'] and gs['z'] <= obj['dposdict']['z']:
         gs['isAlive'] = False
 
-def getGamestate(): # Will be used for saving.
+def getGamestate(): # Will be used for saving gamestate.
     return gs
-def setGamestate(gsin): # Will be used for loading.
+def setGamestate(gsin): # Will be used for loading gamestate.
     gs = gsin
-
-def calcX(x, y, z):
+def calcX(x, y, z): # Convert isometrric X values into actual screen coordinates.
     return ((x * 2 - z * 2) + 0.25 * (x-z)) * 4
-def calcY(x, y, z):
+def calcY(x, y, z): # Convert isometrric Y values into actual screen coordinates.
     return ((x + z - y) + 0.25 * (x+z)) * 4
-def start():
+def load():
     res['charLeft'] = pygame.image.load(gs['char'])
     res['charRight'] = pygame.transform.flip(res['charLeft'], True, False)
     res['bullet'] = pygame.image.load('../assets/sprites/bullet/bullet.png')
     res['hitbox'] = pygame.image.load('../assets/sprites/player/hitbox.png')
     res['lvl'] = pygame.image.load('../maps/' + gs['lvl'] + '/visual.png')
     res['walls'] = pygame.image.load('../maps/' + gs['lvl'] + '/walls.png')
-    chardisplay = res['charLeft']
+    res['chardisplay'] = res['charLeft']
     entities = json.loads(open('../maps/' + gs['lvl'] + '/entities.json').read())
-    lvlmask = pygame.mask.from_surface(res['walls'])
-    hitmask = pygame.mask.from_surface(res['hitbox'])
+    res['lvlmask'] = pygame.mask.from_surface(res['walls'])
+    res['hitmask'] = pygame.mask.from_surface(res['hitbox'])
     dat = json.loads(open('../maps/' + gs['lvl'] + '/dat.json').read())
     sound.play(dat['sounds'])
-    bulletIsExisting = False
     res['stepsounds'] = pygame.mixer.Sound('../assets/sounds/player/step.wav')
+    gs['isLoaded'] = True
+def start():
+    if not gs['isLoaded']:
+        load()
+    
 #
 # Main Game Loop
 #
@@ -89,7 +96,7 @@ def start():
         timeStart = time.process_time() # Used to facilitate timing and FPS, see bottom of loop for more info.
 
         DISPLAYSURF.blit(res['lvl'], (0,0))
-        DISPLAYSURF.blit(chardisplay,(math.floor(gs['realX']),math.floor(gs['realY'])))
+        DISPLAYSURF.blit(res['chardisplay'],(math.floor(gs['realX']),math.floor(gs['realY'])))
 
         for obj in entities: # Tick through every entity in the lvl
             if obj['type'] == 'door':
@@ -97,22 +104,6 @@ def start():
                     return 'CHANGELVL'
             if obj['type'] == 'kill':
                 tickKill(obj)
-        
-        if bulletIsExisting:
-            DISPLAYSURF.blit(res['bullet'],(bx,by))
-            if gs['bulletDirection'] is 'left':
-                bx = bx - 5
-                by = by - 5
-            if gs['bulletDirection'] is 'right':
-                bx = bx + 5
-                by = by + 5
-            if gs['bulletDirection'] is 'up':
-                bx = bx + 5
-                by = by - 5
-            if gs['bulletDirection'] is 'down':
-                bx = bx - 5
-                by = by + 5
-
 #
 # Event Processing
 #
@@ -129,7 +120,7 @@ def start():
                 gs['isMoving'] = True
             if event.type is KEYDOWN and event.key is K_a:
                 gs['isMovingLeft'] = True
-                chardisplay = res['charLeft']
+                res['chardisplay'] = res['charLeft']
                 gs['facing'] = 'left'                
                 gs['isMoving'] = True
             if event.type is KEYDOWN and event.key is K_s:
@@ -138,7 +129,7 @@ def start():
                 gs['isMoving'] = True
             if event.type is KEYDOWN and event.key is K_d:
                 gs['isMovingRight'] = True
-                chardisplay = res['charRight']
+                res['chardisplay'] = res['charRight']
                 gs['facing'] = 'right'
                 gs['isMoving'] = True
                 
@@ -153,23 +144,60 @@ def start():
                 gs['isMovingDown'] = False
             if event.type is KEYUP and event.key is K_d:
                 gs['isMovingRight'] = False
-
-            if event.type is KEYDOWN and event.key is K_e:
-                bx = gs['realX']+45
-                by = gs['realY']+25
-                bulletIsExisting = True
-                gs['bulletDirection'] = gs['facing']
 #
 # Collision Detection and Movement
 #
-        if gs['isMovingUp'] and     lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x'],0,gs['z']-1*gs['speed'])) , math.floor(calcY(gs['x'],0,gs['z']-1*gs['speed'])) ) ) is 0:
-            gs['z'] = gs['z'] - 1*gs['speed']
-        if gs['isMovingLeft'] and   lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x']-1*gs['speed'],0,gs['z'])) , math.floor(calcY(gs['x']-1*gs['speed'],0,gs['z'])) ) ) is 0:
-            gs['x'] = gs['x'] - 1*gs['speed'] 
-        if gs['isMovingDown'] and   lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x'],0,gs['z']+1*gs['speed'])) , math.floor(calcY(gs['x'],0,gs['z']+1*gs['speed'])) ) ) is 0:
-            gs['z'] = gs['z'] + 1*gs['speed'] 
-        if gs['isMovingRight'] and  lvlmask.overlap_area( hitmask , ( math.floor(calcX(gs['x']+1*gs['speed'],0,gs['z'])) , math.floor(calcY(gs['x']+1*gs['speed'],0,gs['z'])) ) ) is 0:
-            gs['x'] = gs['x'] + 1*gs['speed']
+        if gs['isMovingUp'] and gs['velocity']['north'] != gs['speed']:
+            if gs['velocity']['north'] + gs['acceleration'] > gs['speed']:
+                gs['velocity']['north'] = gs['speed']
+            else:
+                gs['velocity']['north'] += gs['acceleration']
+        if gs['isMovingDown'] and gs['velocity']['south'] != gs['speed']:
+            if gs['velocity']['south'] + gs['acceleration'] > gs['speed']:
+                gs['velocity']['south'] = gs['speed']
+            else:
+                gs['velocity']['south'] += gs['acceleration']
+        if gs['isMovingLeft'] and gs['velocity']['west'] != gs['speed']:
+            if gs['velocity']['west'] + gs['acceleration'] > gs['speed']:
+                gs['velocity']['west'] = gs['speed']
+            else:
+                gs['velocity']['west'] += gs['acceleration']
+        if gs['isMovingRight'] and gs['velocity']['east'] != gs['speed']:
+            if gs['velocity']['east'] + gs['acceleration'] > gs['speed']:
+                gs['velocity']['east'] = gs['speed']
+            else:
+                gs['velocity']['east'] += gs['acceleration']
+
+        if not gs['isMovingUp'] and gs['velocity']['north'] > 0:
+            if gs['velocity']['north'] - gs['acceleration'] >= 0:
+                gs['velocity']['north'] -= gs['acceleration']
+            else:
+                gs['velocity']['north'] = 0                
+        if not gs['isMovingDown'] and gs['velocity']['south'] > 0:
+            if gs['velocity']['south'] - gs['acceleration'] >= 0:
+                gs['velocity']['south'] -= gs['acceleration']
+            else:
+                gs['velocity']['south'] = 0                
+        if not gs['isMovingLeft'] and gs['velocity']['west'] > 0:
+            if gs['velocity']['west'] - gs['acceleration'] >= 0:
+                gs['velocity']['west'] -= gs['acceleration']
+            else:
+                gs['velocity']['west'] = 0                
+        if not gs['isMovingRight'] and gs['velocity']['east'] > 0:
+            if gs['velocity']['east'] - gs['acceleration'] >= 0:
+                gs['velocity']['east'] -= gs['acceleration']
+            else:
+                gs['velocity']['east'] = 0
+
+                
+        if gs['velocity']['north'] > 0 and     res['lvlmask'].overlap_area( res['hitmask'] , ( math.floor(calcX(gs['x'],0,gs['z']-gs['velocity']['north'])) , math.floor(calcY(gs['x'],0,gs['z']-gs['velocity']['north'])) ) ) is 0:
+            gs['z'] = gs['z'] - gs['velocity']['north']
+        if gs['velocity']['west'] > 0 and   res['lvlmask'].overlap_area( res['hitmask'] , ( math.floor(calcX(gs['x']-gs['velocity']['west'],0,gs['z'])) , math.floor(calcY(gs['x']-gs['velocity']['west'],0,gs['z'])) ) ) is 0:
+            gs['x'] = gs['x'] - gs['velocity']['west']
+        if gs['velocity']['south'] > 0 and   res['lvlmask'].overlap_area( res['hitmask'] , ( math.floor(calcX(gs['x'],0,gs['z']+gs['velocity']['south'])) , math.floor(calcY(gs['x'],0,gs['z']+gs['velocity']['south'])) ) ) is 0:
+            gs['z'] = gs['z'] + gs['velocity']['south'] 
+        if gs['velocity']['east'] > 0 and  res['lvlmask'].overlap_area( res['hitmask'] , ( math.floor(calcX(gs['x']+gs['velocity']['east'],0,gs['z'])) , math.floor(calcY(gs['x']+gs['velocity']['east'],0,gs['z'])) ) ) is 0:
+            gs['x'] = gs['x'] + gs['velocity']['east']
 #
 # Jumping
 #
@@ -188,6 +216,7 @@ def start():
 # Debug Coordinates
 #
         DISPLAYSURF.blit(FONT.render('X: ' + str(gs['x']) + ' Y: ' + str(gs['y']) + ' Z: ' + str(gs['z']), True, (0, 128, 255), (0, 0, 0)), (25,25)) # Display current player position for dev use.
+        DISPLAYSURF.blit(FONT.render('Nvel: ' + str(gs['velocity']['north']) + ' Evel: ' + str(gs['velocity']['east']) + ' Svel: ' + str(gs['velocity']['south']) + ' Wvel: ' + str(gs['velocity']['west']), True, (0, 128, 255), (0, 0, 0)), (25,500)) # Display current player position for dev use.
 
         
         
